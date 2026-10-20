@@ -1,9 +1,10 @@
 # Requiere la extensión "REST Client" de VS Code (o Visual Studio 2022+).
 # 1) Ejecute "Login Admin" y "Login User" primero: el token se reutiliza en el resto.
 
+# Local (Visual Studio / dotnet run): 5062 · Docker: 8080
 @host = http://localhost:5062
-@adminToken = {{loginAdmin.response.body.accessToken}}
-@userToken = {{loginUser.response.body.accessToken}}
+@adminToken = {{loginAdmin.response.body.$.accessToken}}
+@userToken = {{loginUser.response.body.$.accessToken}}
 
 ### Login Admin
 # @name loginAdmin
