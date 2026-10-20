@@ -1,0 +1,51 @@
+<div class="login">
+  <div class="card login__card">
+    <div class="login__header">
+      <span class="login__logo" aria-hidden="true">⇄</span>
+      <h1>Tipo de Cambio</h1>
+      <p class="muted">Inicie sesión para continuar</p>
+    </div>
+
+    @if (reason() === 'expired') {
+      <div class="alert alert--warning">Su sesión expiró. Inicie sesión nuevamente.</div>
+    }
+
+    @if (error(); as message) {
+      <div class="alert alert--error" role="alert">{{ message }}</div>
+    }
+
+    <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+      <div class="field">
+        <label for="username">Usuario</label>
+        <input id="username" formControlName="username" autocomplete="username" />
+        @if (form.controls.username.touched && form.controls.username.invalid) {
+          <small class="field__error">El usuario es obligatorio.</small>
+        }
+      </div>
+
+      <div class="field">
+        <label for="password">Contraseña</label>
+        <input id="password" type="password" formControlName="password" autocomplete="current-password" />
+        @if (form.controls.password.touched && form.controls.password.invalid) {
+          <small class="field__error">La contraseña es obligatoria.</small>
+        }
+      </div>
+
+      <button type="submit" class="btn btn--primary btn--block" [disabled]="loading()">
+        {{ loading() ? 'Ingresando...' : 'Ingresar' }}
+      </button>
+    </form>
+
+    <div class="demo">
+      <p class="muted">Usuarios de demostración:</p>
+      <div class="demo__buttons">
+        <button type="button" class="btn btn--ghost btn--sm" (click)="fillDemo('admin', 'Admin123*')">
+          admin <span class="badge badge--admin">Admin</span>
+        </button>
+        <button type="button" class="btn btn--ghost btn--sm" (click)="fillDemo('user', 'User123*')">
+          user <span class="badge">User</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

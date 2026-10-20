@@ -1,0 +1,9 @@
+**/bin/
+**/obj/
+**/.vs/
+**/.vscode/
+**/*.user
+postman/
+Dockerfile
+.dockerignore
+CLAUDE.md

@@ -1,0 +1,76 @@
+.topbar {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.topbar__inner {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 0.75rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 700;
+  color: var(--text);
+  text-decoration: none;
+}
+
+.brand__logo {
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 0.5rem;
+  background: var(--primary);
+  color: #fff;
+}
+
+.nav {
+  display: flex;
+  gap: 0.25rem;
+  flex: 1;
+
+  a {
+    padding: 0.5rem 0.75rem;
+    border-radius: var(--radius);
+    color: var(--text-muted);
+    text-decoration: none;
+    font-weight: 500;
+
+    &:hover {
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    &.active {
+      background: var(--primary-soft);
+      color: var(--primary);
+    }
+  }
+}
+
+.user {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.user__name {
+  font-weight: 500;
+}
+
+.content {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}

@@ -1,0 +1,47 @@
+.form {
+  display: block;
+  margin-bottom: 1.5rem;
+}
+
+.toolbar {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  padding: 1rem;
+  border-bottom: 1px solid var(--border);
+
+  input {
+    flex: 1;
+    max-width: 320px;
+  }
+}
+
+.table-wrapper {
+  overflow-x: auto;
+}
+
+.currency {
+  display: inline-block;
+  padding: 0.125rem 0.5rem;
+  border-radius: 0.375rem;
+  background: var(--bg);
+  font-weight: 600;
+  font-family: ui-monospace, monospace;
+}
+
+.actions {
+  white-space: nowrap;
+
+  .btn + .btn {
+    margin-left: 0.375rem;
+  }
+}
+
+.state {
+  padding: 2rem 1rem;
+  text-align: center;
+}
+
+tr.selected td {
+  background: var(--primary-soft);
+}

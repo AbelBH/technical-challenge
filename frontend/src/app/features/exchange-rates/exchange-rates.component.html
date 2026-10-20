@@ -1,0 +1,85 @@
+<div class="page-header page-header--row">
+  <div>
+    <h1>Tipos de cambio</h1>
+    <p class="muted">
+      @if (auth.isAdmin()) {
+        Administre los tipos de cambio disponibles.
+      } @else {
+        Consulta de tipos de cambio. Solo un administrador puede modificarlos.
+      }
+    </p>
+  </div>
+
+  @if (auth.isAdmin() && formState().mode === 'closed') {
+    <button type="button" class="btn btn--primary" (click)="openCreate()">+ Nuevo</button>
+  }
+</div>
+
+@if (formState().mode !== 'closed') {
+  <app-exchange-rate-form
+    class="form"
+    [rate]="editingRate()"
+    [saving]="saving()"
+    (create)="onCreate($event)"
+    (update)="onUpdate($event)"
+    (cancel)="closeForm()"
+  />
+}
+
+<div class="card card--flush">
+  <div class="toolbar">
+    <input
+      type="search"
+      placeholder="Buscar moneda (ej: USD)"
+      aria-label="Buscar moneda"
+      [value]="search()"
+      (input)="search.set($any($event.target).value)"
+    />
+    <button type="button" class="btn btn--ghost btn--sm" (click)="load()" [disabled]="loading()">Recargar</button>
+  </div>
+
+  @if (loading()) {
+    <p class="state muted">Cargando...</p>
+  } @else if (loadError(); as message) {
+    <div class="state">
+      <div class="alert alert--error" role="alert">{{ message }}</div>
+      <button type="button" class="btn btn--ghost btn--sm" (click)="load()">Reintentar</button>
+    </div>
+  } @else {
+    <div class="table-wrapper">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Origen</th>
+            <th>Destino</th>
+            <th class="num">Tipo de cambio</th>
+            <th>Actualizado</th>
+            @if (auth.isAdmin()) {
+              <th class="num">Acciones</th>
+            }
+          </tr>
+        </thead>
+        <tbody>
+          @for (rate of filteredRates(); track rate.id) {
+            <tr [class.selected]="editingRate()?.id === rate.id">
+              <td><span class="currency">{{ rate.sourceCurrency }}</span></td>
+              <td><span class="currency">{{ rate.targetCurrency }}</span></td>
+              <td class="num">{{ rate.rate | number: '1.2-6' }}</td>
+              <td class="muted">{{ rate.updatedAt | date: 'dd/MM/yyyy HH:mm' }}</td>
+              @if (auth.isAdmin()) {
+                <td class="num actions">
+                  <button type="button" class="btn btn--ghost btn--sm" (click)="openEdit(rate)">Editar</button>
+                  <button type="button" class="btn btn--danger btn--sm" (click)="remove(rate)">Eliminar</button>
+                </td>
+              }
+            </tr>
+          } @empty {
+            <tr>
+              <td [attr.colspan]="auth.isAdmin() ? 5 : 4" class="state muted">No se encontraron tipos de cambio.</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

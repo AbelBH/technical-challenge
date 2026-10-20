@@ -1,0 +1,30 @@
+# Secretos (usar .env.example como plantilla)
+.env
+
+# Notas de trabajo locales (no forman parte de la entrega)
+CLAUDE.md
+Reto Técnico.md
+
+# .NET
+**/bin/
+**/obj/
+*.user
+*.suo
+.vs/
+TestResults/
+
+# Angular / Node
+**/node_modules/
+**/dist/
+**/.angular/
+npm-debug.log*
+
+# Bases SQLite en archivo (si se cambia de in-memory a archivo)
+*.db
+*.db-shm
+*.db-wal
+
+# Sistema operativo / editores
+.DS_Store
+Thumbs.db
+.idea/

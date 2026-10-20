@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/CurrencyExchange.Api/CurrencyExchange.Api.csproj" />
+    <Project Path="src/CurrencyExchange.Application/CurrencyExchange.Application.csproj" />
+    <Project Path="src/CurrencyExchange.Domain/CurrencyExchange.Domain.csproj" />
+    <Project Path="src/CurrencyExchange.Infrastructure/CurrencyExchange.Infrastructure.csproj" />
+  </Folder>
+</Solution>

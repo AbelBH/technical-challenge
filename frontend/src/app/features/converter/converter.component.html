@@ -1,0 +1,78 @@
+<div class="page-header">
+  <h1>Conversión de moneda</h1>
+  <p class="muted">Aplique el tipo de cambio vigente a un monto.</p>
+</div>
+
+<div class="converter">
+  <form class="card" [formGroup]="form" (ngSubmit)="convert()" novalidate>
+    <div class="field">
+      <label for="amount">Monto</label>
+      <input id="amount" type="number" min="0" step="0.01" formControlName="amount" />
+      @if (form.controls.amount.touched && form.controls.amount.invalid) {
+        <small class="field__error">Ingrese un monto mayor o igual a 0.</small>
+      }
+    </div>
+
+    <div class="currencies">
+      <div class="field">
+        <label for="source">Moneda origen</label>
+        <select id="source" formControlName="sourceCurrency">
+          @for (code of currencies(); track code) {
+            <option [value]="code">{{ code }}</option>
+          }
+        </select>
+      </div>
+
+      <button type="button" class="btn btn--ghost swap" (click)="swap()" title="Intercambiar monedas" aria-label="Intercambiar monedas">
+        ⇄
+      </button>
+
+      <div class="field">
+        <label for="target">Moneda destino</label>
+        <select id="target" formControlName="targetCurrency">
+          @for (code of currencies(); track code) {
+            <option [value]="code">{{ code }}</option>
+          }
+        </select>
+      </div>
+    </div>
+
+    @if (error(); as message) {
+      <div class="alert alert--error" role="alert">{{ message }}</div>
+    }
+
+    <button type="submit" class="btn btn--primary btn--block" [disabled]="loading()">
+      {{ loading() ? 'Convirtiendo...' : 'Convertir' }}
+    </button>
+  </form>
+
+  <section class="card result" [class.result--empty]="!result()" aria-live="polite">
+    @if (result(); as r) {
+      <p class="result__label">Monto con tipo de cambio</p>
+      <p class="result__amount">
+        {{ r.convertedAmount | number: '1.2-4' }} <span>{{ r.targetCurrency }}</span>
+      </p>
+
+      <dl class="result__details">
+        <div>
+          <dt>Monto</dt>
+          <dd>{{ r.amount | number: '1.2-4' }} {{ r.sourceCurrency }}</dd>
+        </div>
+        <div>
+          <dt>Moneda origen</dt>
+          <dd>{{ r.sourceCurrency }}</dd>
+        </div>
+        <div>
+          <dt>Moneda destino</dt>
+          <dd>{{ r.targetCurrency }}</dd>
+        </div>
+        <div>
+          <dt>Tipo de cambio</dt>
+          <dd>1 {{ r.sourceCurrency }} = {{ r.exchangeRate | number: '1.2-6' }} {{ r.targetCurrency }}</dd>
+        </div>
+      </dl>
+    } @else {
+      <p class="muted">El resultado de la conversión aparecerá aquí.</p>
+    }
+  </section>
+</div>

@@ -1,0 +1,96 @@
+# Requiere la extensión "REST Client" de VS Code (o Visual Studio 2022+).
+# 1) Ejecute "Login Admin" y "Login User" primero: el token se reutiliza en el resto.
+
+@host = http://localhost:5062
+@adminToken = {{loginAdmin.response.body.accessToken}}
+@userToken = {{loginUser.response.body.accessToken}}
+
+### Login Admin
+# @name loginAdmin
+POST {{host}}/api/auth/login
+Content-Type: application/json
+
+{
+  "username": "admin",
+  "password": "Admin123*"
+}
+
+### Login User
+# @name loginUser
+POST {{host}}/api/auth/login
+Content-Type: application/json
+
+{
+  "username": "user",
+  "password": "User123*"
+}
+
+### Listar tipos de cambio
+GET {{host}}/api/exchange-rates
+Authorization: Bearer {{adminToken}}
+
+### Obtener por Id
+GET {{host}}/api/exchange-rates/1
+Authorization: Bearer {{adminToken}}
+
+### Crear tipo de cambio (con su inverso, en una transacción)
+# @name create
+POST {{host}}/api/exchange-rates
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "sourceCurrency": "usd",
+  "targetCurrency": "mxn",
+  "rate": 18.25,
+  "createInverse": true
+}
+
+### Actualizar tasa del creado
+PUT {{host}}/api/exchange-rates/{{create.response.body.$[0].id}}
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "rate": 18.5
+}
+
+### Eliminar el creado
+DELETE {{host}}/api/exchange-rates/{{create.response.body.$[0].id}}
+Authorization: Bearer {{adminToken}}
+
+### Convertir monto
+POST {{host}}/api/conversions
+Authorization: Bearer {{userToken}}
+Content-Type: application/json
+
+{
+  "amount": 100,
+  "sourceCurrency": "USD",
+  "targetCurrency": "PEN"
+}
+
+### Error: sin token (401)
+GET {{host}}/api/exchange-rates
+
+### Error: User intenta crear (403)
+POST {{host}}/api/exchange-rates
+Authorization: Bearer {{userToken}}
+Content-Type: application/json
+
+{
+  "sourceCurrency": "USD",
+  "targetCurrency": "JPY",
+  "rate": 150
+}
+
+### Error: datos inválidos (400)
+POST {{host}}/api/conversions
+Authorization: Bearer {{userToken}}
+Content-Type: application/json
+
+{
+  "amount": -5,
+  "sourceCurrency": "US",
+  "targetCurrency": "PEN"
+}

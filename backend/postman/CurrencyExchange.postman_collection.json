@@ -1,0 +1,346 @@
+{
+  "info": {
+    "name": "CurrencyExchange API",
+    "description": "API de tipo de cambio (.NET 10 + EF Core + JWT).\n\n**Uso:**\n1. Seleccione el environment (Local o Docker).\n2. Ejecute la carpeta `1. Auth` (guarda los tokens automáticamente).\n3. Ejecute el resto de requests, o toda la colección con *Run collection*.\n\nUsuarios demo: `admin / Admin123*` (Admin) y `user / User123*` (User).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [{ "key": "token", "value": "{{adminToken}}", "type": "string" }]
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:5062" },
+    { "key": "adminToken", "value": "" },
+    { "key": "userToken", "value": "" },
+    { "key": "createdId", "value": "" },
+    { "key": "createdInverseId", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "1. Auth",
+      "item": [
+        {
+          "name": "Login Admin",
+          "event": [{
+            "listen": "test",
+            "script": { "type": "text/javascript", "exec": [
+              "pm.test('200 OK', () => pm.response.to.have.status(200));",
+              "const body = pm.response.json();",
+              "pm.test('Devuelve token Bearer con rol Admin', () => {",
+              "    pm.expect(body.accessToken).to.be.a('string').and.not.empty;",
+              "    pm.expect(body.tokenType).to.eql('Bearer');",
+              "    pm.expect(body.role).to.eql('Admin');",
+              "});",
+              "pm.collectionVariables.set('adminToken', body.accessToken);"
+            ]}
+          }],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"Admin123*\"\n}" },
+            "url": { "raw": "{{baseUrl}}/api/auth/login", "host": ["{{baseUrl}}"], "path": ["api", "auth", "login"] }
+          }
+        },
+        {
+          "name": "Login User",
+          "event": [{
+            "listen": "test",
+            "script": { "type": "text/javascript", "exec": [
+              "pm.test('200 OK', () => pm.response.to.have.status(200));",
+              "const body = pm.response.json();",
+              "pm.test('Rol User', () => pm.expect(body.role).to.eql('User'));",
+              "pm.collectionVariables.set('userToken', body.accessToken);"
+            ]}
+          }],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"username\": \"user\",\n  \"password\": \"User123*\"\n}" },
+            "url": { "raw": "{{baseUrl}}/api/auth/login", "host": ["{{baseUrl}}"], "path": ["api", "auth", "login"] }
+          }
+        },
+        {
+          "name": "Login - credenciales inválidas (401)",
+          "event": [{
+            "listen": "test",
+            "script": { "type": "text/javascript", "exec": [
+              "pm.test('401 Unauthorized', () => pm.response.to.have.status(401));",
+              "pm.test('Mensaje genérico', () => pm.expect(pm.response.json().detail).to.eql('Usuario o contraseña incorrectos.'));"
+            ]}
+          }],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"incorrecta\"\n}" },
+            "url": { "raw": "{{baseUrl}}/api/auth/login", "host": ["{{baseUrl}}"], "path": ["api", "auth", "login"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Tipos de cambio (CRUD)",
+      "item": [
+        {
+          "name": "Listar",
+          "event": [{
+            "listen": "test",
+            "script": { "type": "text/javascript", "exec": [
+              "pm.test('200 OK', () => pm.response.to.have.status(200));",
+              "pm.test('Devuelve una lista', () => pm.expect(pm.response.json()).to.be.an('array').and.not.empty);"
+            ]}
+          }],
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/exchange-rates", "host": ["{{baseUrl}}"], "path": ["api", "exchange-rates"] }
+          }
+        },
+        {
+          "name": "Obtener por Id",
+          "event": [{
+            "listen": "test",
+            "script": { "type": "text/javascript", "exec": [
+              "pm.test('200 OK', () => pm.response.to.have.status(200));",
+              "pm.test('Es USD → PEN', () => {",
+              "    const body = pm.response.json();",
+              "    pm.expect(body.sourceCurrency).to.eql('USD');",
+              "    pm.expect(body.targetCurrency).to.eql('PEN');",
+              "});"
+            ]}
+          }],
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/exchange-rates/1", "host": ["{{baseUrl}}"], "path": ["api", "exchange-rates", "1"] }
+          }
+        },
+        {
+          "name": "Crear (con inverso, en transacción)",
+          "event": [{
+            "listen": "test",
+            "script": { "type": "text/javascript", "exec": [
+              "pm.test('201 Created', () => pm.response.to.have.status(201));",
+              "const body = pm.response.json();",
+              "pm.test('Crea el par y su inverso', () => {",
+              "    pm.expect(body).to.have.lengthOf(2);",
+              "    pm.expect(body[0].sourceCurrency).to.eql('USD');",
+              "    pm.expect(body[1].sourceCurrency).to.eql('MXN');",
+              "});",
+              "pm.test('Header Location presente', () => pm.response.to.have.header('Location'));",
+              "pm.collectionVariables.set('createdId', body[0].id);",
+              "pm.collectionVariables.set('createdInverseId', body[1].id);"
+            ]}
+          }],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"sourceCurrency\": \"usd\",\n  \"targetCurrency\": \"mxn\",\n  \"rate\": 18.25,\n  \"createInverse\": true\n}" },
+            "url": { "raw": "{{baseUrl}}/api/exchange-rates", "host": ["{{baseUrl}}"], "path": ["api", "exchange-rates"] }
+          }
+        },
+        {
+          "name": "Actualizar tasa",
+          "event": [{
+            "listen": "test",
+            "script": { "type": "text/javascript", "exec": [
+              "pm.test('200 OK', () => pm.response.to.have.status(200));",
+              "pm.test('Tasa actualizada', () => pm.expect(pm.response.json().rate).to.eql(18.5));"
+            ]}
+          }],
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"rate\": 18.5\n}" },
+            "url": { "raw": "{{baseUrl}}/api/exchange-rates/{{createdId}}", "host": ["{{baseUrl}}"], "path": ["api", "exchange-rates", "{{createdId}}"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Conversión",
+      "item": [
+        {
+          "name": "Convertir monto",
+          "event": [{
+            "listen": "test",
+            "script": { "type": "text/javascript", "exec": [
+              "pm.test('200 OK', () => pm.response.to.have.status(200));",
+              "const body = pm.response.json();",
+              "pm.test('Contiene los campos requeridos', () => {",
+              "    pm.expect(body).to.have.all.keys('amount', 'convertedAmount', 'sourceCurrency', 'targetCurrency', 'exchangeRate');",
+              "});",
+              "pm.test('Monto convertido = monto × tipo de cambio', () => {",
+              "    pm.expect(body.convertedAmount).to.be.closeTo(body.amount * body.exchangeRate, 0.0001);",
+              "});"
+            ]}
+          }],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"amount\": 100,\n  \"sourceCurrency\": \"USD\",\n  \"targetCurrency\": \"MXN\"\n}" },
+            "url": { "raw": "{{baseUrl}}/api/conversions", "host": ["{{baseUrl}}"], "path": ["api", "conversions"] }
+          }
+        },
+        {
+          "name": "Convertir con rol User",
+          "event": [{
+            "listen": "test",
+            "script": { "type": "text/javascript", "exec": [
+              "pm.test('User puede convertir (200)', () => pm.response.to.have.status(200));"
+            ]}
+          }],
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{userToken}}", "type": "string" }] },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"amount\": 250.50,\n  \"sourceCurrency\": \"eur\",\n  \"targetCurrency\": \"pen\"\n}" },
+            "url": { "raw": "{{baseUrl}}/api/conversions", "host": ["{{baseUrl}}"], "path": ["api", "conversions"] }
+          }
+        },
+        {
+          "name": "Convertir misma moneda (tasa 1)",
+          "event": [{
+            "listen": "test",
+            "script": { "type": "text/javascript", "exec": [
+              "pm.test('200 OK', () => pm.response.to.have.status(200));",
+              "pm.test('Tipo de cambio 1', () => pm.expect(pm.response.json().exchangeRate).to.eql(1));"
+            ]}
+          }],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"amount\": 50,\n  \"sourceCurrency\": \"PEN\",\n  \"targetCurrency\": \"PEN\"\n}" },
+            "url": { "raw": "{{baseUrl}}/api/conversions", "host": ["{{baseUrl}}"], "path": ["api", "conversions"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Seguridad y errores",
+      "item": [
+        {
+          "name": "Sin token (401)",
+          "event": [{
+            "listen": "test",
+            "script": { "type": "text/javascript", "exec": [
+              "pm.test('401 Unauthorized', () => pm.response.to.have.status(401));",
+              "pm.test('Formato ProblemDetails', () => pm.expect(pm.response.json()).to.include.keys('title', 'status', 'detail', 'traceId'));"
+            ]}
+          }],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/exchange-rates", "host": ["{{baseUrl}}"], "path": ["api", "exchange-rates"] }
+          }
+        },
+        {
+          "name": "User intenta crear (403)",
+          "event": [{
+            "listen": "test",
+            "script": { "type": "text/javascript", "exec": [
+              "pm.test('403 Forbidden', () => pm.response.to.have.status(403));"
+            ]}
+          }],
+          "request": {
+            "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{userToken}}", "type": "string" }] },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"sourceCurrency\": \"USD\",\n  \"targetCurrency\": \"JPY\",\n  \"rate\": 150\n}" },
+            "url": { "raw": "{{baseUrl}}/api/exchange-rates", "host": ["{{baseUrl}}"], "path": ["api", "exchange-rates"] }
+          }
+        },
+        {
+          "name": "Par duplicado (409)",
+          "event": [{
+            "listen": "test",
+            "script": { "type": "text/javascript", "exec": [
+              "pm.test('409 Conflict', () => pm.response.to.have.status(409));"
+            ]}
+          }],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"sourceCurrency\": \"USD\",\n  \"targetCurrency\": \"PEN\",\n  \"rate\": 3.70\n}" },
+            "url": { "raw": "{{baseUrl}}/api/exchange-rates", "host": ["{{baseUrl}}"], "path": ["api", "exchange-rates"] }
+          }
+        },
+        {
+          "name": "Datos inválidos (400)",
+          "event": [{
+            "listen": "test",
+            "script": { "type": "text/javascript", "exec": [
+              "pm.test('400 Bad Request', () => pm.response.to.have.status(400));",
+              "pm.test('Errores por campo', () => pm.expect(pm.response.json().errors).to.include.keys('sourceCurrency', 'rate'));"
+            ]}
+          }],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"sourceCurrency\": \"US\",\n  \"targetCurrency\": \"PEN\",\n  \"rate\": -1\n}" },
+            "url": { "raw": "{{baseUrl}}/api/exchange-rates", "host": ["{{baseUrl}}"], "path": ["api", "exchange-rates"] }
+          }
+        },
+        {
+          "name": "Id inexistente (404)",
+          "event": [{
+            "listen": "test",
+            "script": { "type": "text/javascript", "exec": [
+              "pm.test('404 Not Found', () => pm.response.to.have.status(404));"
+            ]}
+          }],
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/exchange-rates/9999", "host": ["{{baseUrl}}"], "path": ["api", "exchange-rates", "9999"] }
+          }
+        },
+        {
+          "name": "Conversión sin tipo de cambio (404)",
+          "event": [{
+            "listen": "test",
+            "script": { "type": "text/javascript", "exec": [
+              "pm.test('404 Not Found', () => pm.response.to.have.status(404));"
+            ]}
+          }],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"amount\": 10,\n  \"sourceCurrency\": \"JPY\",\n  \"targetCurrency\": \"CLP\"\n}" },
+            "url": { "raw": "{{baseUrl}}/api/conversions", "host": ["{{baseUrl}}"], "path": ["api", "conversions"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "5. Limpieza",
+      "item": [
+        {
+          "name": "Eliminar tipo de cambio creado",
+          "event": [{
+            "listen": "test",
+            "script": { "type": "text/javascript", "exec": [
+              "pm.test('204 No Content', () => pm.response.to.have.status(204));"
+            ]}
+          }],
+          "request": {
+            "method": "DELETE",
+            "url": { "raw": "{{baseUrl}}/api/exchange-rates/{{createdId}}", "host": ["{{baseUrl}}"], "path": ["api", "exchange-rates", "{{createdId}}"] }
+          }
+        },
+        {
+          "name": "Eliminar inverso creado",
+          "event": [{
+            "listen": "test",
+            "script": { "type": "text/javascript", "exec": [
+              "pm.test('204 No Content', () => pm.response.to.have.status(204));"
+            ]}
+          }],
+          "request": {
+            "method": "DELETE",
+            "url": { "raw": "{{baseUrl}}/api/exchange-rates/{{createdInverseId}}", "host": ["{{baseUrl}}"], "path": ["api", "exchange-rates", "{{createdInverseId}}"] }
+          }
+        }
+      ]
+    }
+  ]
+}

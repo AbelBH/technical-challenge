@@ -1,0 +1,23 @@
+<header class="topbar">
+  <div class="topbar__inner">
+    <a routerLink="/" class="brand">
+      <span class="brand__logo" aria-hidden="true">⇄</span>
+      <span>Tipo de Cambio</span>
+    </a>
+
+    <nav class="nav">
+      <a routerLink="/converter" routerLinkActive="active">Conversión</a>
+      <a routerLink="/exchange-rates" routerLinkActive="active">Tipos de cambio</a>
+    </nav>
+
+    <div class="user">
+      <span class="user__name">{{ auth.username() }}</span>
+      <span class="badge" [class.badge--admin]="auth.isAdmin()">{{ auth.role() }}</span>
+      <button type="button" class="btn btn--ghost btn--sm" (click)="auth.logout()">Salir</button>
+    </div>
+  </div>
+</header>
+
+<main class="content">
+  <router-outlet />
+</main>

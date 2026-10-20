@@ -1,0 +1,32 @@
+# Levantar todo:   docker compose up --build -d
+# Front:           http://localhost:4200   (admin / Admin123*)
+# API + Swagger:   http://localhost:8080/swagger
+# Detener:         docker compose down
+
+name: currency-exchange
+
+services:
+  api:
+    build:
+      context: ./backend
+    image: currency-exchange-api
+    container_name: currency-exchange-api
+    ports:
+      - "8080:8080"
+    environment:
+      # La clave JWT se toma de la variable JWT_KEY (archivo .env); si no existe, usa un valor de demo.
+      Jwt__Key: ${JWT_KEY:-docker-demo-secret-key-change-me-0123456789}
+      Swagger__Enabled: "true"
+      Cors__AllowedOrigins__0: http://localhost:4200
+    restart: unless-stopped
+
+  web:
+    build:
+      context: ./frontend
+    image: currency-exchange-web
+    container_name: currency-exchange-web
+    ports:
+      - "4200:80"
+    depends_on:
+      - api
+    restart: unless-stopped
