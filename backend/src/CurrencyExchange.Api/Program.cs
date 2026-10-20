@@ -10,7 +10,9 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
-builder.Services.AddControllers()
+// Las validaciones de campos obligatorios las hace FluentValidation (mensajes en español),
+// no el [Required] implícito que .NET agrega a los string no anulables.
+builder.Services.AddControllers(options => options.SuppressImplicitRequiredAttributeForNonNullableReferenceTypes = true)
     .ConfigureApiBehaviorOptions(options =>
     {
         // Errores de formato del cuerpo (JSON inválido, tipos incorrectos) con el mismo formato que el middleware.

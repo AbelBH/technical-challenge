@@ -8,7 +8,8 @@ public class ConversionRequestValidator : AbstractValidator<ConversionRequest>
     public ConversionRequestValidator()
     {
         RuleFor(x => x.Amount)
-            .GreaterThanOrEqualTo(0).WithMessage("El monto no puede ser negativo.");
+            .GreaterThanOrEqualTo(0).WithMessage("El monto no puede ser negativo.")
+            .LessThanOrEqualTo(ValidationLimits.MaxAmount).WithMessage("El monto no puede superar 1,000,000,000,000.");
 
         RuleFor(x => x.SourceCurrency).ValidCurrencyCode().WithName("La moneda origen");
         RuleFor(x => x.TargetCurrency).ValidCurrencyCode().WithName("La moneda destino");

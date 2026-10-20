@@ -42,8 +42,15 @@ public class ExchangeRate
     /// <summary>
     /// Crea el tipo de cambio inverso (ej: USD→PEN 3.75 ⇒ PEN→USD 0.266667).
     /// </summary>
-    public ExchangeRate CreateInverse() =>
-        new(TargetCurrency, SourceCurrency, Math.Round(1 / Rate, 6, MidpointRounding.AwayFromZero));
+    public ExchangeRate CreateInverse()
+    {
+        var inverse = Math.Round(1 / Rate, 6, MidpointRounding.AwayFromZero);
+
+        if (inverse == 0)
+            throw new DomainException("El tipo de cambio es demasiado grande para calcular su inverso con 6 decimales.");
+
+        return new(TargetCurrency, SourceCurrency, inverse);
+    }
 
     private void SetRate(decimal rate)
     {

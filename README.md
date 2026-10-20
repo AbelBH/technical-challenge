@@ -183,6 +183,7 @@ Navegador ──► :4200  web (nginx) ──/api/*──► api:8080  (.NET)
 | **Configuración validada al arrancar** | Si la clave JWT falta o tiene menos de 32 caracteres, la API no inicia. |
 | **Conversión de misma moneda** | Devuelve tipo de cambio 1 sin consultar la base. |
 | **Códigos de moneda** | Se normalizan a mayúsculas (`usd` → `USD`) y deben tener 3 letras (ISO 4217). |
+| **Límites** | Monto máximo de 1 000 000 000 000 y tasa máxima de 1 000 000 (6 decimales). Evitan el desborde de `decimal` en monto × tasa y garantizan que el tipo de cambio inverso sea representable. |
 
 ---
 

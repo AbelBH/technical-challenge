@@ -32,5 +32,6 @@ internal static class RateRules
     public static IRuleBuilderOptions<T, decimal> ValidRate<T>(this IRuleBuilder<T, decimal> rule) =>
         rule
             .GreaterThan(0).WithMessage("El tipo de cambio debe ser mayor a cero.")
+            .LessThanOrEqualTo(ValidationLimits.MaxRate).WithMessage("El tipo de cambio no puede superar 1,000,000.")
             .PrecisionScale(18, 6, ignoreTrailingZeros: true).WithMessage("El tipo de cambio admite como máximo 6 decimales.");
 }

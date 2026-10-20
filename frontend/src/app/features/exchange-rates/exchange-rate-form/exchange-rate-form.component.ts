@@ -33,7 +33,7 @@ export class ExchangeRateFormComponent {
   protected readonly form = inject(FormBuilder).nonNullable.group({
     sourceCurrency: ['', [Validators.required, Validators.pattern(CURRENCY_PATTERN)]],
     targetCurrency: ['', [Validators.required, Validators.pattern(CURRENCY_PATTERN)]],
-    rate: [0, [Validators.required, Validators.min(0.000001)]],
+    rate: [0, [Validators.required, Validators.min(0.000001), Validators.max(1_000_000)]],
     createInverse: [true],
   });
 

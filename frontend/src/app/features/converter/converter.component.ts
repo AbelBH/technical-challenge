@@ -31,7 +31,7 @@ export class ConverterComponent implements OnInit {
   protected readonly result = signal<ConversionResponse | null>(null);
 
   protected readonly form = inject(FormBuilder).nonNullable.group({
-    amount: [100, [Validators.required, Validators.min(0)]],
+    amount: [100, [Validators.required, Validators.min(0), Validators.max(1_000_000_000_000)]],
     sourceCurrency: ['USD', Validators.required],
     targetCurrency: ['PEN', Validators.required],
   });
