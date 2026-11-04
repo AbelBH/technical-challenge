@@ -5,4 +5,7 @@
     <Project Path="src/CurrencyExchange.Domain/CurrencyExchange.Domain.csproj" />
     <Project Path="src/CurrencyExchange.Infrastructure/CurrencyExchange.Infrastructure.csproj" />
   </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/CurrencyExchange.UnitTests/CurrencyExchange.UnitTests.csproj" />
+  </Folder>
 </Solution>

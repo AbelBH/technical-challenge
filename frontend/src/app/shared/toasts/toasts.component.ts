@@ -36,8 +36,12 @@ import { NotificationService } from '../../core/notifications/notification.servi
       box-shadow: var(--shadow);
       animation: slide-in 0.2s ease-out;
     }
-    .toast--success { background: var(--success); }
-    .toast--error { background: var(--danger); }
+    .toast--success {
+      background: var(--success);
+    }
+    .toast--error {
+      background: var(--danger);
+    }
     button {
       background: none;
       border: none;
@@ -47,8 +51,14 @@ import { NotificationService } from '../../core/notifications/notification.servi
       line-height: 1;
     }
     @keyframes slide-in {
-      from { transform: translateY(0.5rem); opacity: 0; }
-      to { transform: translateY(0); opacity: 1; }
+      from {
+        transform: translateY(0.5rem);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
     }
   `,
 })

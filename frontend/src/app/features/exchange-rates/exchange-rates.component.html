@@ -35,7 +35,9 @@
       [value]="search()"
       (input)="search.set($any($event.target).value)"
     />
-    <button type="button" class="btn btn--ghost btn--sm" (click)="load()" [disabled]="loading()">Recargar</button>
+    <button type="button" class="btn btn--ghost btn--sm" (click)="load()" [disabled]="loading()">
+      Recargar
+    </button>
   </div>
 
   @if (loading()) {
@@ -62,20 +64,30 @@
         <tbody>
           @for (rate of filteredRates(); track rate.id) {
             <tr [class.selected]="editingRate()?.id === rate.id">
-              <td><span class="currency">{{ rate.sourceCurrency }}</span></td>
-              <td><span class="currency">{{ rate.targetCurrency }}</span></td>
+              <td>
+                <span class="currency">{{ rate.sourceCurrency }}</span>
+              </td>
+              <td>
+                <span class="currency">{{ rate.targetCurrency }}</span>
+              </td>
               <td class="num">{{ rate.rate | number: '1.2-6' }}</td>
               <td class="muted">{{ rate.updatedAt | date: 'dd/MM/yyyy HH:mm' }}</td>
               @if (auth.isAdmin()) {
                 <td class="num actions">
-                  <button type="button" class="btn btn--ghost btn--sm" (click)="openEdit(rate)">Editar</button>
-                  <button type="button" class="btn btn--danger btn--sm" (click)="remove(rate)">Eliminar</button>
+                  <button type="button" class="btn btn--ghost btn--sm" (click)="openEdit(rate)">
+                    Editar
+                  </button>
+                  <button type="button" class="btn btn--danger btn--sm" (click)="remove(rate)">
+                    Eliminar
+                  </button>
                 </td>
               }
             </tr>
           } @empty {
             <tr>
-              <td [attr.colspan]="auth.isAdmin() ? 5 : 4" class="state muted">No se encontraron tipos de cambio.</td>
+              <td [attr.colspan]="auth.isAdmin() ? 5 : 4" class="state muted">
+                No se encontraron tipos de cambio.
+              </td>
             </tr>
           }
         </tbody>
