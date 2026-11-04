@@ -155,7 +155,7 @@ jobs:
 
       # Etiquetas: "latest" y el SHA del commit (trazabilidad: qué código hay en cada imagen).
       - id: meta
-        uses: docker/metadata-action@v5
+        uses: docker/metadata-action@v6
         with:
           images: ghcr.io/${{ github.repository_owner }}/currency-exchange-${{ matrix.name }}
           tags: |
