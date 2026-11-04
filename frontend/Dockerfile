@@ -1,5 +1,5 @@
 # ---------- Etapa 1: build de Angular (Node 24 LTS) ----------
-FROM node:24-alpine AS build
+FROM node:26-alpine AS build
 WORKDIR /app
 
 # Dependencias primero para aprovechar la caché de capas de Docker.
