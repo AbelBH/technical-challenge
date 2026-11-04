@@ -4,7 +4,13 @@
   <div class="row">
     <div class="field">
       <label for="sourceCurrency">Moneda origen</label>
-      <input id="sourceCurrency" formControlName="sourceCurrency" maxlength="3" placeholder="USD" class="uppercase" />
+      <input
+        id="sourceCurrency"
+        formControlName="sourceCurrency"
+        maxlength="3"
+        placeholder="USD"
+        class="uppercase"
+      />
       @if (hasError('sourceCurrency')) {
         <small class="field__error">Código de 3 letras, ej: USD.</small>
       }
@@ -12,7 +18,13 @@
 
     <div class="field">
       <label for="targetCurrency">Moneda destino</label>
-      <input id="targetCurrency" formControlName="targetCurrency" maxlength="3" placeholder="PEN" class="uppercase" />
+      <input
+        id="targetCurrency"
+        formControlName="targetCurrency"
+        maxlength="3"
+        placeholder="PEN"
+        class="uppercase"
+      />
       @if (hasError('targetCurrency')) {
         <small class="field__error">Código de 3 letras, ej: PEN.</small>
       }
@@ -35,7 +47,9 @@
   }
 
   <div class="actions">
-    <button type="button" class="btn btn--ghost" (click)="cancel.emit()" [disabled]="saving()">Cancelar</button>
+    <button type="button" class="btn btn--ghost" (click)="cancel.emit()" [disabled]="saving()">
+      Cancelar
+    </button>
     <button type="submit" class="btn btn--primary" [disabled]="saving()">
       {{ saving() ? 'Guardando...' : 'Guardar' }}
     </button>

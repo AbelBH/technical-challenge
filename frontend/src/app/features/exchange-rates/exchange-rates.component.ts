@@ -1,5 +1,12 @@
 import { DatePipe, DecimalPipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  OnInit,
+  computed,
+  inject,
+  signal,
+} from '@angular/core';
 import { finalize } from 'rxjs';
 import { AuthService } from '../../core/auth/auth.service';
 import { getErrorMessage } from '../../core/http/problem-details';
@@ -36,7 +43,9 @@ export class ExchangeRatesComponent implements OnInit {
   protected readonly filteredRates = computed(() => {
     const term = this.search().trim().toUpperCase();
     return term
-      ? this.rates().filter((r) => r.sourceCurrency.includes(term) || r.targetCurrency.includes(term))
+      ? this.rates().filter(
+          (r) => r.sourceCurrency.includes(term) || r.targetCurrency.includes(term),
+        )
       : this.rates();
   });
 
@@ -115,7 +124,9 @@ export class ExchangeRatesComponent implements OnInit {
     this.service.delete(rate.id).subscribe({
       next: () => {
         this.rates.update((list) => list.filter((r) => r.id !== rate.id));
-        this.notifications.success(`Tipo de cambio ${rate.sourceCurrency} → ${rate.targetCurrency} eliminado.`);
+        this.notifications.success(
+          `Tipo de cambio ${rate.sourceCurrency} → ${rate.targetCurrency} eliminado.`,
+        );
         if (this.editingRate()?.id === rate.id) this.closeForm();
       },
       error: (err) => this.notifications.error(getErrorMessage(err)),
