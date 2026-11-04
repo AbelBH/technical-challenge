@@ -1,5 +1,7 @@
 # API de Tipo de Cambio
 
+[![CI/CD](https://github.com/AbelBH/technical-challenge/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/AbelBH/technical-challenge/actions/workflows/ci-cd.yml)
+
 Solución full stack para aplicar tipos de cambio a montos: **API REST en .NET 10** con Entity Framework Core, JWT y Clean Architecture, y un **front en Angular 22** que la consume. Todo se levanta con Docker en un solo comando.
 
 | | |
@@ -7,7 +9,7 @@ Solución full stack para aplicar tipos de cambio a montos: **API REST en .NET 1
 | **Backend** | .NET 10 (LTS) · ASP.NET Core Web API · EF Core 10 · SQLite en memoria · FluentValidation · JWT |
 | **Frontend** | Angular 22 · standalone + zoneless · signals · Reactive Forms · interceptors · lazy loading |
 | **Infraestructura** | Docker (contenedores Linux) · docker compose · nginx como proxy inverso |
-| **Pruebas** | Colección Postman con 31 aserciones · archivo `.http` para VS Code · tests unitarios Vitest |
+| **Pruebas** | Colección Postman con 31 aserciones · archivo `.http` para VS Code · tests unitarios xUnit (48) y Vitest · pipeline CI/CD con GitHub Actions |
 
 ---
 
@@ -190,9 +192,22 @@ Navegador ──► :4200  web (nginx) ──/api/*──► api:8080  (.NET)
 ## Pruebas
 
 ```bash
+# API: tests unitarios xUnit (dominio, servicios y validadores; repositorios simulados con NSubstitute)
+cd backend && dotnet test
+
 # Front: tests unitarios (interceptor JWT, manejo de errores)
 cd frontend && npx ng test --watch=false
 
 # API: colección Postman completa (con la API en ejecución)
 cd backend && npx newman run postman/CurrencyExchange.postman_collection.json -e postman/CurrencyExchange.Local.postman_environment.json
 ```
+
+### Integración continua
+
+El workflow [`.github/workflows/ci-cd.yml`](.github/workflows/ci-cd.yml) se ejecuta en cada push y pull request a `main`:
+
+1. **Backend y frontend en paralelo**: verificación de formato, build, tests unitarios (xUnit / Vitest) y build de producción.
+2. **E2E**: levanta todo con Docker Compose, espera a `/health` y ejecuta la colección Postman con Newman.
+3. **Publicación** (solo en `main`): sube las imágenes `currency-exchange-api` y `currency-exchange-web` a GitHub Container Registry, etiquetadas con `latest` y el SHA del commit.
+
+Dependabot propone actualizaciones semanales de NuGet, npm, imágenes Docker y Actions.
