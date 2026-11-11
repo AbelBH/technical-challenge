@@ -15,7 +15,7 @@ RUN dotnet publish src/CurrencyExchange.Api/CurrencyExchange.Api.csproj \
     -c Release -o /app/publish --no-restore /p:UseAppHost=false
 
 # ---------- Etapa 2: runtime (solo ASP.NET Core, imagen mucho más liviana) ----------
-FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime
+FROM mcr.microsoft.com/dotnet/aspnet:11.0 AS runtime
 WORKDIR /app
 
 ENV ASPNETCORE_HTTP_PORTS=8080 \
